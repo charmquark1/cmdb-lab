@@ -1,9 +1,9 @@
 #git add ONLY python, text and pdf files. 
 
 #Ignore everything including subdirectories
-*/*
+*
 #Except..
-!.py
+!*.py
 !.pdf
 !.txt
 #..even if they are in subdirectories
