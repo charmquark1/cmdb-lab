@@ -4,6 +4,6 @@
 *
 #Except..
 !*.py
-!.pdf
-!.txt
+!*.pdf
+!*.txt
 #..even if they are in subdirectories
