@@ -1,0 +1,5 @@
+Stats For velvet_Assem/contigs.fa : 
+ 
+Number of Contigs: 305
+Lengths (min, max, avg, N50):  31 ,  968 ,  156 ,  234
+N50 is greater than the Average.

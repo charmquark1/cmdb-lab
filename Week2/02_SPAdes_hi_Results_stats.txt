@@ -1,0 +1,5 @@
+Stats For Spades_h_Assem/contigs.fasta : 
+ 
+Number of Contigs: 1
+Lengths (min, max, avg, N50):  100000 ,  100000 ,  100000 ,  None
+error: N50 cannot be determined. Bad comparison

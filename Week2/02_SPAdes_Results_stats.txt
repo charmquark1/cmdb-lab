@@ -1,0 +1,5 @@
+Stats For Spades_Assem/contigs.fasta : 
+ 
+Number of Contigs: 128
+Lengths (min, max, avg, N50):  207 ,  1737 ,  389 ,  374
+N50 is less than the Average.
