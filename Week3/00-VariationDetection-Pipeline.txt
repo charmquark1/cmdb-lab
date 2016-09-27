@@ -1,0 +1,79 @@
+"""
+!READ THIS: Used mm9 assembly for reference. This caused problems in downstream analysis, perhaps due to new version of snpeff cannot supporting mm9 build.  
+
+Data is paired-end Illumina for 3 mouse lines
+for Chr 4, 7 and 11
+
+Goal: Identify Variants between mutants and control
+"""
+
+1. Map reads; FASTQ > BAM
+## assign each sample a read group when mapping so they can be recognized
+
+need reference genome:
+Download here: http://hgdownload.cse.ucsc.edu/goldenpath/mm9/chromosomes/
+use bwa mem
+bwa mem -R 'readname_sample' 
+    
+    1 Index reference file (for 3 files)
+    cat <genome4> <gen7> <gen11> > totalgenome.fa
+    bwa index <totalgenome.fa>
+    
+    2 Align reads and set a readgroup
+    bwa mem -R "@RG\tID:1526_007\tSM:mouse" 
+        Reference/chr4-7-11.fa Seq_Data2/1526_007_LA.region.fq | samtools view -Sb > 1526_007.bam 
+    bwa mem -R '183-005-NB' ...
+    bwa mem -R '1449_002' ...
+    
+    3. Sort bam file
+    samtools sort 1526_007.bam -o 1526_007.sort.bam 
+    
+
+(mem - fast maximal matching then does extension, which works well for long reads)
+(at 50 bp, youre better off using the older non-mem option)
+mm9
+
+References: http://blog.code4pho.com/bioinformatics/29-bwa-alignment-methods
+
+2. #Call Variants: BAM > VCF.
+#You can look to see if samples have diff readgroups with samtools
+freebayes, multiple bam files
+    freebayes -f <totalgenome.fa> -v t_n.vcf -b t1.bam -b n1.bam 
+
+distinguish between het or variant ()--diploid organism
+	indel realignment
+	quality score recall, (quality of variant calling is proportional to mappingquality)
+	Variant calling
+    
+/Users/cmdb/cmdb-lab/Week3 $ freebayes -f Reference/chr4-7-11.fa -v 01-variant_murine.vcf -b 1526_007.sort.bam -b 1449_002.sort.bam -b 183-005.sort.bam 
+ERROR(freebayes): Opened BAM reader without index file, jumping is disabled.
+BamMultiReader::LocatingIndexes: error while locating index files: 
+	BamReader::LocateIndex: could not locate index: 
+	BamRandomAccessController::LocateIndex: could not find index file for:1526_007.sort.bam
+	BamReader::LocateIndex: could not locate index: 
+	BamRandomAccessController::LocateIndex: could not find index file for:1449_002.sort.bam
+	BamReader::LocateIndex: could not locate index: 
+	BamRandomAccessController::LocateIndex: could not find index file for:183-005.sort.bam
+
+
+#Filter your Variants w similar criteria as paper
+Filter by Quality (This would keep any records with QUAL > 20):
+#freebayes -f ref.fa aln.bam | vcffilter -f "QUAL > 20" >out.vcf
+    How to Filter for Coverage?
+    How to filter for 20% or greater Alternate Reads (observation count)?
+        freebayes -f Reference/chr4-7-11.fa --min-coverage 10 --min-alternate-fraction 0.2 -v 02-fil_variant_murine.vcf -b 1526_007.sort.bam -b 1449_002.sort.bam -b 183-005.sort.bam 
+    #How To Filter Against Common Snp Database To Look For Rare Variants?
+
+#Predict consequence of each variant
+snpEff
+	downloads a db of coding genes that knows (testMm37.61 )
+    snpeff download http://downloads.sourceforge.net/project/snpeff/databases/v4_2/snpEff_v4_2_testMm37.61.zip
+    
+    Usage: snpEff [command] [options] [files]
+
+#Homework:
+1. Original VCF (from freebayes)
+2. filtered VCF to high qual variants
+3. snpEff results
+4. txt file telling you the consequences of each variant
+
