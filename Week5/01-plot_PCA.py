@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
 """
-Make PCA plot from plink2 --pca output (eigenvectors)
+Make PCA plot from "plink2 --pca" output (eigenvectors)
+Input, use evector file (plink.eigenvec) from plink2 output
+Output, PCA plot
+
 """
 
 import sys
