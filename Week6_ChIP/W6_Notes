@@ -1,0 +1,120 @@
+(ChIP seq)
+	QC > Short Read alignment (BWA)> Peak Calling (MACS, SICER or 		PeakRanger) > Peak Annotation> Calc Enriched Regions
+		> Visualize with genome browser; motif discovery; combine with 		gene expression
+		
+finding regions that are enriched for TFs
+motif discovery, to define the affinity for types of motifs to that sequence
+
+MACS: peak caller
+- give it a sonificatio size (b), then a fold enrichment to look for. 
+- fold enrichment is 42. take a window thats twice our soni size. go for windows that have 32 times
+
+distinguish between high binding and easily fragmented. 
+- control and treated and neg control?
+- MACS will compare and determine significance of calls
+
+Controlling for multiple testing:
+- Statistical significance for genomewide studies, introduced FDR
+
+4 data sets, fastq files
+	2 cell types: G1E (mouse ES, GATA1 null), ER4
+	GATA1 master regulator in hemapoeitosis (arrested in early stage)
+	fusion protein thats activated by some treatment
+	
+	G1E --> ER4
+	
+	CTCF / input control to ChIP-seq
+
+Quality Control
+	adaptor trimming
+Download genome file chr19_fa ; build index 
+	bowtie2 -build
+	
+Short Read alignment
+
+Peak Calling:
+
+Find changed in bindings
+- bedtools -subtract
+
+Motif Finding
+- meme chip
+take 100 of strongest peaks and find enrichment
+Peaks (100  bp), 20 bp is TF binding site
+
+Sequence logo: 
+
+
+_____________________
+
+COMMANDS:
+
+wget http://jamestaylor.org/outgoing/g1e.tar.xz
+gunzip g1e.tar.xz 
+tar -xvf g1e.tar 
+
+#download murine genome from igenomes.illumina
+wget http://hgdownload.cse.ucsc.edu/goldenPath/mm10/chromosomes/chr19.fa.gz
+
+# align 
+bowtie2-build [options]* <reference_in> <bt2_base>
+
+bowtie2 -x chr19_in -U CTCF_ER4.fastq -S 01-ER4_map.sam
+..repeat for all 
+
+270631 reads; of these:
+  270631 (100.00%) were unpaired; of these:
+    4371 (1.62%) aligned 0 times
+    264736 (97.82%) aligned exactly 1 time
+    1524 (0.56%) aligned >1 times
+98.38% overall alignment rate
+
+G1E_in.sam
+276733 reads; of these:
+  276733 (100.00%) were unpaired; of these:
+    5012 (1.81%) aligned 0 times
+    270142 (97.62%) aligned exactly 1 time
+    1579 (0.57%) aligned >1 times
+98.19% overall alignment rate
+
+#sort sam files
+samtools sort 01-ER4_map.sam -o 01-ER4_map_sort.sam
+
+
+# macs2 to call peaks, callpeaks
+##effecive genome size 
+macs2 callpeak -t 01-G1E_map_sort.sam -c 01-G1E_in_sort.sam -g 85000000
+
+#differential binding over differentiation
+##find where CTCF is lost and gained over the course of differentiation:
+
+bedtools subtract
+
+## A - B (nonoverlap of A will remain). map - ctrl
+
+bedtools subtract -a ER4_MACS/NA_peaks.narrowPeak -b G1E_MACS/NA_peaks.narrowPeak > ER4_G1E_sub.bed
+	wc 643    6430   45625 ER4_G1E_sub.bed
+
+bedtools subtract -a ER4_MACS/NA_peaks.narrowPeak -b G1E_MACS/NA_peaks.narrowPeak -A > ER4_G1E_sub_strict.bed
+
+# Motif finding with meme-chip for strongest 100 peaks during ER4. 
+sort -nrk5 ER4_G1_gain.bed > 03-gainCTCF_sort.bed
+
+## find top 100 
+## make fasta file with the 100 sequences
+sed -n -e '1,100p' 03-gainCTCF_sort.bed > 04-gain100hits.bed
+
+meme-chip [options] <sequences>
+
+chr19	start	end		strength
+
+
+I wrote a python file and there is also:
+bedtools getfasta -fi chr19.fa -bed 03-gainCTCF_sort.bed -fo 04-gainCTCF.fa
+
+meme-chip -db motif_databases/JASPAR/JASPAR_CORE_2016.meme -maxw 20 
+
+
+	
+
+ 
