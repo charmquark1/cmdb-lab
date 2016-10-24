@@ -1,0 +1,4 @@
+The motif with the strongest significance is the canonical CTCF motif, as found in JASPAR. It has an e-value of magnitude 10**(-223).
+This motif is also known to have significant association with INSM1 and btd, but this association is not as strong as CTCF.
+
+There is another enriched motif that was calculate, but annotation was not found in the JASPAR database. 
