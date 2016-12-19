@@ -8,15 +8,12 @@ import scipy.cluster.hierarchy as sch
 from scipy.stats import ttest_rel
 
 data = open(sys.argv[1])
-# ctcf_ obj = open(sys.argv[2] )
 
 earl1=[]
 earl2=[]
 late1=[]
 late2=[]
 #calculate mean between early 2 per gene
-
-## calc 
 
 #calculate mean between late2 per gene
 
@@ -66,8 +63,5 @@ for i, j in zip(diff_genes, diff_val):
 	f.write(str(i)+"\t"+str(j))
 	f.write("\n")
 
-
-
-
-
 #how do i use ttest_rel on individual genes??
+##I used ttest on early and late sets and found they were significantly different, but don't know how to use them to determine individual DE genes. 
