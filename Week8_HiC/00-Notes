@@ -1,0 +1,76 @@
+
+Analyze chom conf capture data
+
+find nucleotide sequences of fragments
+
+1. Start with paired-end seq of Hi-C fragments
+2. Align reads
+3. Assign reads to parental genome
+4. Assign to Restriction Fragment 
+
+STEPS:
+
+HiFive. 
+1. Normalize data
+Use HiFive to remove primer-specific biases
+	a.  
+	
+Inputs: align ends separately (not paired)
+
+Align reads
+bwa_mem - align_reads.py
+pair reads, resolving chimeric reads - sam2raw.py
+normalization : HiFive
+call domains 
+very careful about whether you can call point interactions
+
+#Introduce virtualenv
+
+sudo pip install virtualenv
+
+Msg: 
+Installing collected packages: virtualenv
+Successfully installed virtualenv-15.0.3
+/Library/Python/2.6/site-packages/pip-8.1.2-py2.6.egg/pip/_vendor/requests/packages/urllib3/util/ssl_.py:122: InsecurePlatformWarning: A true SSLContext object is not available. This prevents urllib3 from configuring SSL appropriately and may cause certain SSL connections to fail. You can upgrade to a newer version of Python to solve this. For more information, see https://urllib3.readthedocs.org/en/latest/security.html#insecureplatformwarning.
+  InsecurePlatformWarning
+
+
+INPUTS:
+1. ctcf peaks.tsv 
+	chr, start
+2. Nora_primers.bed
+	chrX start, stop, gc, names_forward
+3. Nora_ESC.counts
+	names_forward and rev, counts 
+
+## Hifive 5c-complete : Normalize data. Remove primer specific biases
+hifive 5c-complete express -C Inputs/Nora_ESC_male_E14.counts --prefix Nora Inputs/Nora_Primers.bed
+
+Loading data from Nora_ESC_male_E14.counts... 29575926 validly-mapped reads loaded.
+29575926 total validly-mapped read pairs loaded. 232540 unique pairs
+Writing fragment pair data to file... Done
+Filtering fragments... Removed 0 of 1039 fragments
+Finding distance parameters... Done
+Learning corrections... Final Cost: 0.000004  Done 
+
+Outputs: Nora.fcd   Nora.fcp   Nora.frags
+
+##Heatmaps. Input fcp 5C file, output png graph
+hifive 5c-heatmap 
+
+hifive 5c-heatmap Nora.fcp 02-Out_frag.heat -i 02_fragOut.png -d fragment
+
+enrichment = log(count/expected) 
+* run fragments not bins
+for each set of fragments
+
+which positions the CTCF lines up with
+inside heat file, you have boundaries for each read
+You can eliminate positions that dont have CTCF (only have few bins left)
+Look at each bins that have the highest value
+
+
+
+
+##CTCF interactions.
+heat file 
