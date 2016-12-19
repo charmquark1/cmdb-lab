@@ -15,19 +15,11 @@ exp = file['0.expected'][...]
 
 #tell it to ignore 0!!!
 res = np.empty((counts.shape))
-logratiolist=[]
-for i in range(0,459):
-	for j in range(0,459):
-		if counts[i,j]==0:
-			continue
-		else:
-			logratio = np.log(counts[i,j])-np.log(exp[i,j])
-			logratiolist.append(logratio)
-print len(logratiolist)
-			#log_all = counts[(np.where(counts>0))]/exp[(np.where(counts>0))]
-			
-#res[np.where(counts>0)]=log_all
-#print res
+
+log_all = counts[(np.where(counts>0))]/exp[(np.where(counts>0))]
+
+res[np.where(counts>0)]=log_all
+print res
 
 
 # Calculate where peaks print 
