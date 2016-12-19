@@ -67,7 +67,7 @@ print label[289]
 creblike = []
 
 for k, g in zip(label,genes):
-	if k==1:
+	if k==0:
 		creblike.append(g)
 #print len(creblike)		
 f = open("04-creblikeGenes.txt", "w")
